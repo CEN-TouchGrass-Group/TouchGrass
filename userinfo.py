@@ -25,3 +25,13 @@ def login():
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
+
+@app.route("/createAccount", methods=["POST"])
+def createAccount():
+    data = request.get_json()
+    newUsername = data.get("username")
+    newPassword = data.get("password")
+    
+    collection_name.insert_one({"username": newUsername, "password": newPassword})
+
+    return jsonify({"message": "Account created successfully"})

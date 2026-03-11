@@ -2,32 +2,32 @@
 import { useState } from "react";
 import Link from "next/link";
 
-export default function Home() {
+export default function Second() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  async function handlecreateAccount() {
-    const res = await fetch("http://127.0.0.1:5000/createAccount", {
+  async function handleLogin() {
+    const res = await fetch("http://127.0.0.1:5000/login", {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({username, password}),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
     });
 
     const data = await res.json();
 
-    if(!res.ok) {
+    if (!res.ok) {
       setError(data.error);
     } else {
-      alert("Account created successfully!");
+      alert("Logged in successfully!");
+      <Link href="/Landing"></Link>
     }
   }
-
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center">
       <h1 className="text-4xl font-bold text-green-500">Welcome to Touchgrass</h1>
-      <p className="text-gray-500 mt-4">Create an Account!</p>
+      <p className="text-gray-500 mt-4">A New Way to Explore Gainesville.</p>
 
       <div className="mt-8 flex flex-col gap-4 w-80">
         <input
@@ -45,21 +45,12 @@ export default function Home() {
           className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 text-green-500"
         />
         {error && <p className="text-red-500 text-sm">{error}</p>}
-        <Link href = "/Login">
-          <button
-            onClick={handlecreateAccount}
-            className="bg-green-500 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600"
-          >
-            Create Account
-          </button>
-        </Link>
-        <Link href = "/Login">
-          <button
-            className="bg-green-500 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600"
-          >
-            Log In
-          </button>
-        </Link>
+        <button
+          onClick={handleLogin}
+          className="bg-green-500 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600"
+        >
+          Log In
+        </button>
       </div>
     </div>
   );

@@ -23,9 +23,6 @@ def login():
 
     return jsonify({"message": "Logged in successfully!"})
 
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
-
 @app.route("/createAccount", methods=["POST"])
 def createAccount():
     data = request.get_json()
@@ -35,3 +32,7 @@ def createAccount():
     collection_name.insert_one({"username": newUsername, "password": newPassword})
 
     return jsonify({"message": "Account created successfully"})
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)

@@ -1,3 +1,4 @@
+//CREATE ACCOUNT PAGE
 "use client";
 import { useState } from "react";
 import Link from "next/link";
@@ -48,15 +49,13 @@ export default function Home() {
         <Link href = "/Login">
           <button
             onClick={handlecreateAccount}
-            className="bg-green-500 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600"
+            className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600"
           >
             Create Account
           </button>
         </Link>
         <Link href = "/Login">
-          <button
-            className="bg-green-500 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600"
-          >
+          <button className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600">
             Log In
           </button>
         </Link>

@@ -1,11 +1,14 @@
+//LOGIN PAGE
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Second() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const goTo = useRouter();
 
   async function handleLogin() {
     const res = await fetch("http://127.0.0.1:5000/login", {
@@ -20,7 +23,8 @@ export default function Second() {
       setError(data.error);
     } else {
       alert("Logged in successfully!");
-      <Link href="/Landing"></Link>
+      //<Link href="/Landing"></Link>
+      goTo.push("/Pg1");
     }
   }
 
@@ -47,7 +51,7 @@ export default function Second() {
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <button
           onClick={handleLogin}
-          className="bg-green-500 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600"
+          className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600"
         >
           Log In
         </button>

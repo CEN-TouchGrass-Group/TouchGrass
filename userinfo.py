@@ -28,6 +28,8 @@ def createAccount():
     data = request.get_json()
     newUsername = data.get("username")
     newPassword = data.get("password")
+    if newUsername == "" or newPassword == "" :
+        return jsonify({"message": "Credentials cannot be empty"})
     
     collection_name.insert_one({"username": newUsername, "password": newPassword})
 

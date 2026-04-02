@@ -1,29 +1,124 @@
 //PAGE 1
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Home() {
+  const [error, setError] = useState("");
+  const [username, Name] = useState("");
+  const [pic1, setPic1] = useState<string>("upload.jpg");
+  const [pic2, setPic2] = useState<string>("upload.jpg");
+  const [pic3, setPic3] = useState<string>("upload.jpg");
+  const [pic4, setPic4] = useState<string>("upload.jpg");
+  const [pic5, setPic5] = useState<string>("upload.jpg");
+
+  useEffect(() => {
+    Name(localStorage.getItem("username"));
+    const username = localStorage.getItem("username");
+  }, []);
+
+  async function imageChange(e:React.ChangeEvent<HTMLInputElement>, setPreview: (url: string) => void, picture: string, username: string, imageIndex: number){
+    const file = e.target.files?.[0];
+    if (file) {
+      const link = URL.createObjectURL(file);
+      setPreview(link);
+      const formData = new FormData();
+      formData.append("image", file);
+      try {
+        const res = await fetch(`http://127.0.0.1:5000/uploadImage/${username}/${imageIndex}`, {
+        method: "POST", body: formData,
+        });
+        const data = await res.json();
+        if(!res.ok){
+          setError(data.error);
+        }
+        else{
+          alert("Image uploaded successfully!");
+        }
+      }
+      catch (err) {
+        alert("could not connect");
+      }
+    }
+  }
+
     return (
         <div className="min-h-screen bg-white flex flex-col">
             <nav className="text-white">
                 <div className="font-bold bg-green-400 text-center py-8 text-xl border-b-2 border-black">Welcome to TouchGrass</div>
                 <div className="flex">
                     <Link href="" className="flex-1">
-                        <button className="bg-green-600 px-15 py-4 w-full text-center border-1 border-b-3 border-l-0 border-black">Page1</button>
+                        <button className="bg-green-600 px-15 py-4 w-full text-center border-1 border-b-3 border-l-0 border-black">Challenge Page</button>
                     </Link>
                     <Link href="/Pg2" className="flex-1">
-                        <button className="bg-green-500 hover:bg-gray-500 px-15 py-4 w-full text-center border-2 border-black border-l-1 border-r-1">Page2</button>
+                        <button className="bg-green-500 hover:bg-gray-500 px-15 py-4 w-full text-center border-2 border-black border-l-1 border-r-1">Voting Page</button>
                     </Link>
                     <Link href="/Pg3" className="flex-1">
-                        <button className="bg-green-500 hover:bg-gray-500 px-15 py-4 w-full text-center border-2 border-black border-l-1 border-r-1">Page3</button>
+                        <button className="bg-green-500 hover:bg-gray-500 px-15 py-4 w-full text-center border-2 border-black border-l-1 border-r-1">Leaderboard Page</button>
                     </Link>
                     <Link href="/Pg4" className="flex-1">
-                    <button className="bg-green-500 hover:bg-gray-500 px-15 py-4 w-full text-center border-2 border-black border-l-1">Page4</button>
+                    <button className="bg-green-500 hover:bg-gray-500 px-15 py-4 w-full text-center border-2 border-black border-l-1">Profile Page</button>
                     </Link>
                 </div>                
             </nav>
 
+            <div className="page">
+
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Cat 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
+      <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
+        <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 1</h2>
+        <label className = "hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>
+          Choose Image:
+          <input style = {{display:'none',border:'2px solid green',marginTop:'7px',borderRadius:'8px',padding:'6px 12px'}} type="file" accept="image/*" onChange={(e) => imageChange(e, setPic1, "pic1", username, 0)} />
+          <img style = {{width: pic1 === 'upload.jpg' ? '40%' : '100%', height: 'auto'}} src={pic1}/>
+        </label>
+      </div>
+
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Cat 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
+      <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
+        <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 2</h2>
+        <label className = "hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>
+          Choose Image:
+          <input style = {{display:'none',border:'2px solid green',marginTop:'7px',borderRadius:'8px',padding:'6px 12px'}} type="file" accept="image/*" onChange={(e) => imageChange(e, setPic2, "pic2", username, 1)} />
+          <img style = {{width: pic2 === 'upload.jpg' ? '40%' : '100%', height: 'auto'}} src={pic2}/>
+        </label>
+      </div>
+
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Cat 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
+      <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
+        <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 3</h2>
+        <label className = "hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>
+          Choose Image:
+          <input style = {{display:'none',border:'2px solid green',marginTop:'7px',borderRadius:'8px',padding:'6px 12px'}} type="file" accept="image/*" onChange={(e) => imageChange(e, setPic3, "pic3", username, 2)} />
+          <img style = {{width: pic3 === 'upload.jpg' ? '40%' : '100%', height: 'auto'}} src={pic3}/>
+        </label>
+      </div>
+
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Cat 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
+      <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
+        <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 4</h2>
+        <label className = "hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>
+          Choose Image:
+          <input style = {{display:'none',border:'2px solid green',marginTop:'7px',borderRadius:'8px',padding:'6px 12px'}} type="file" accept="image/*" onChange={(e) => imageChange(e, setPic4, "pic4", username, 3)} />
+          <img style = {{width: pic4 === 'upload.jpg' ? '40%' : '100%', height: 'auto'}} src={pic4}/>
+        </label>
+      </div>
+
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Cat 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
+      <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
+        <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 5</h2>
+        <label className = "hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>
+          Choose Image:
+          <input style = {{display:'none',border:'2px solid green',marginTop:'7px',borderRadius:'8px'}} type="file" accept="image/*" onChange={(e) => imageChange(e, setPic5, "pic5", username, 4)} />
+          <img style = {{width: pic5 === 'upload.jpg' ? '40%' : '100%', height: 'auto'}} src={pic5}/>
+        </label>
+      </div>
+    </div>
             
         </div>
     );

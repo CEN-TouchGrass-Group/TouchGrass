@@ -4,6 +4,36 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Home() {
+  //Defining weekly objectives seed
+  const now = new Date();
+  const seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+
+  function seededRandom(seed: number) {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  }
+
+  const index = Math.floor(seededRandom(seed) * 50); // same for everyone today
+
+  //Using index to pull from csv, generate array of objectives
+  const [objectives, setObjectives] = useState<string[]>([]);
+
+  useEffect(() => {
+    const files = ["Animals", "Places", "Items", "Foods", "Miscellaneous"];
+    
+    Promise.all(
+      files.map(f => fetch(`/${f}.csv`).then(res => res.text()))
+    ).then(results => {
+      const picked = results.map(text => {
+        const rows = text.split("\n").map(r => r.trim()).filter(r => r);
+        return rows[index];
+      });
+      setObjectives(picked);
+    });
+  }, [index]);
+
+  //display
+
   const [error, setError] = useState("");
   const [username, Name] = useState("");
   const [pic1, setPic1] = useState<string>("upload.jpg");
@@ -65,7 +95,7 @@ export default function Home() {
             <div className="page">
 
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Animals</h2>
-      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: {objectives[0]}</h2>
       <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
         <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 1</h2>
         <label className = "hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>
@@ -75,8 +105,8 @@ export default function Home() {
         </label>
       </div>
 
-      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Foods</h2>
-      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Places</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: {objectives[1]}</h2>
       <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
         <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 2</h2>
         <label className = "hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>
@@ -87,7 +117,7 @@ export default function Home() {
       </div>
 
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Items</h2>
-      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: {objectives[2]}</h2>
       <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
         <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 3</h2>
         <label className = "hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>
@@ -97,8 +127,8 @@ export default function Home() {
         </label>
       </div>
 
-      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Places</h2>
-      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Foods</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: {objectives[3]}</h2>
       <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
         <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 4</h2>
         <label className = "hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>
@@ -109,7 +139,7 @@ export default function Home() {
       </div>
 
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Miscellaneous</h2>
-      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: {objectives[4]}</h2>
       <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
         <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 5</h2>
         <label className = "hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>

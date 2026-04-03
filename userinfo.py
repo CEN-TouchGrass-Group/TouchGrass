@@ -4,24 +4,61 @@ from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
-from gridfs import GridFS   # Mongo helper for storing files
-from bson import ObjectId   # Type for Mongo stored files IDs
-from werkzeug.security import generate_password_hash, check_password_hash   # For password hashing
+from gridfs import GridFS
+from bson import ObjectId
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-
 
 CONNECTION_STRING = "mongodb+srv://TreeHugger:admin@touchgrassmain.lzxzeib.mongodb.net/?appName=TouchGrassMain"
 client = MongoClient(CONNECTION_STRING)
 database = client['User_info']
 collection_name = database['login']
+image_collection = database['Images']
 #print("Connection successful")
 
 app = Flask(__name__)
 CORS(app)
 
-fs = GridFS(database) # for images
+fs = GridFS(database)
 image_count = 5
 extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+
+'''
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    username = data.get("username")
+    password = data.get("password")
+    user = collection_name.find_one({"username": username})
+    if not user or user.get("password") != password:
+        return jsonify({"error": "Invalid username or password"}), 401
+
+    return jsonify({"message": "Logged in successfully!", "user": JSONify_user(user)}), 200
+
+@app.route("/createAccount", methods=["POST"])
+def createAccount():
+    data = request.get_json()
+    newUsername = data.get("username")
+    newPassword = data.get("password")
+    if newUsername == "" or newPassword == "" :
+        return jsonify({"message": "Credentials cannot be empty"})
+    
+    collection_name.insert_one({"username": newUsername, "password": newPassword, "touches": 0})
+
+    return jsonify({"message": "Account created successfully"})
+
+
+@app.route("/getTouches", methods=["GET"])
+def getTouches():
+    username = request.args.get("username")
+    user = collection_name.find_one({"username" : username})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    return jsonify({"touches": user["touches"]})
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
+'''
 
 def allowed_file(filename): #check that the file is of an allowed type, and that it has a type at all
     if '.' in filename:
@@ -84,7 +121,8 @@ def createAccount():
         "username": newUsername,
         "password_hash": password_hash,
         "images": [None] * image_count,
-        "created_at": datetime.utcnow()
+        "created_at": datetime.utcnow(),
+        "touches": 0
     }
 
     try:
@@ -154,3 +192,14 @@ def uploadImage(username, image_index):
         "message": f"Image stored successfully in slot {image_index}",
         "user": JSONify_user(updated_user)
     }), 200
+
+@app.route("/getTouches", methods=["GET"])
+def getTouches():
+    username = request.args.get("username")
+    user = collection_name.find_one({"username" : username})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    return jsonify({"touches": user["touches"]})
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)

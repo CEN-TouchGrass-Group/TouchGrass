@@ -40,7 +40,7 @@ export default function Home() {
 
             <div className="h-[3px] bg-green-400 mx-[15%]"></div>
 
-            <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Voting Category: Foods</h2>
+            <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Voting Category: Places</h2>
             <div className="flex gap-[25%] pl-[20%] pt-[25px] pb-[100px]">
                 <label className = "w-1/4 hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>
                 Option 1:
@@ -70,7 +70,7 @@ export default function Home() {
 
             <div className="h-[3px] bg-green-400 mx-[15%]"></div>
 
-            <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Voting Category: Places</h2>
+            <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Voting Category: Foods</h2>
             <div className="flex gap-[25%] pl-[20%] pt-[25px] pb-[100px]">
                 <label className = "w-1/4 hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>
                 Option 1:

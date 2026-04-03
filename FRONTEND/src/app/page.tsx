@@ -2,18 +2,21 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
+  const goTo = useRouter();
   async function handlecreateAccount() {
-    const res = await fetch("http://127.0.0.1:5000/createAccount", {
+    if (username != "" && password != ""){
+      const res = await fetch("http://127.0.0.1:5000/createAccount", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({username, password}),
     });
+
 
     const data = await res.json();
 
@@ -21,6 +24,8 @@ export default function Home() {
       setError(data.error);
     } else {
       alert("Account created successfully!");
+      goTo.push("/Login")
+    }
     }
   }
 
@@ -46,14 +51,12 @@ export default function Home() {
           className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 text-green-500"
         />
         {error && <p className="text-red-500 text-sm">{error}</p>}
-        <Link href = "/Login">
           <button
             onClick={handlecreateAccount}
             className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600"
           >
             Create Account
           </button>
-        </Link>
         <Link href = "/Login">
           <button className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600">
             Log In

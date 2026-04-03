@@ -22,6 +22,7 @@ export default function Second() {
     if (!res.ok) {
       setError(data.error);
     } else {
+      localStorage.setItem("username", username);
       alert("Logged in successfully!");
       //<Link href="/Landing"></Link>
       goTo.push("/Pg1");

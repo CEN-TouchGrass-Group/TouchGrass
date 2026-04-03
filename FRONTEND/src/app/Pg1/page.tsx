@@ -4,6 +4,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Home() {
+  //Defining weekly objectives
+  const rng = new Date();
+  const seed = rng.getFullYear() * 10000 + (rng.getMonth() + 1) * 100 + rng.getDate(); 
+
+
+
+
+
   const [error, setError] = useState("");
   const [username, Name] = useState("");
   const [pic1, setPic1] = useState<string>("upload.jpg");
@@ -64,7 +72,7 @@ export default function Home() {
 
             <div className="page">
 
-      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Cat 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Animals</h2>
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
       <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
         <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 1</h2>
@@ -75,7 +83,7 @@ export default function Home() {
         </label>
       </div>
 
-      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Cat 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Places</h2>
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
       <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
         <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 2</h2>
@@ -86,7 +94,7 @@ export default function Home() {
         </label>
       </div>
 
-      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Cat 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Items</h2>
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
       <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
         <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 3</h2>
@@ -97,7 +105,7 @@ export default function Home() {
         </label>
       </div>
 
-      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Cat 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Foods</h2>
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
       <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
         <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 4</h2>
@@ -108,7 +116,7 @@ export default function Home() {
         </label>
       </div>
 
-      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Cat 1</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Miscellaneous</h2>
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: Obj 1</h2>
       <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
         <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 5</h2>

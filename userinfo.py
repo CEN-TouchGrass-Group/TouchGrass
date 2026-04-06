@@ -201,5 +201,29 @@ def getTouches():
         return jsonify({"error": "User not found"}), 404
     return jsonify({"touches": user["touches"]})
 
+@app.route("/getImages/<file_id>", methods=["GET"])
+def getImages(file_id):
+    try:
+        file = fs.get(ObjectId(file_id))
+        return Response(file.read(), mimetype=file.content_type)
+    except:
+        return jsonify({"error": "Images not found"}), 404
+    
+@app.route("/getPictures", methods=["GET"])
+def getPictures():
+    username = request.args.get("username")
+    user = collection_name.find_one({"username" : username})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    image = []
+    for img in user["images"]:
+        if img is None:
+            image.append(None)
+        else:
+            image.append({
+                "file_id": str(img["file_id"]),"filename": img["filename"],"content_type": img["content_type"],
+            })
+    return jsonify({"pictures" : image})
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

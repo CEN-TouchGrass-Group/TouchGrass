@@ -45,7 +45,19 @@ export default function Home() {
   useEffect(() => {
     Name(localStorage.getItem("username"));
     const username = localStorage.getItem("username");
-  }, []);
+
+    fetch(`http://127.0.0.1:5000/getWeeklySubmission?username=${username}`)
+      .then(res => res.json())
+      .then(data => {
+        const pics = data.weekly_submission.images
+        setPic1(pics[0] ? `http://127.0.0.1:5000/weeklyImage/${pics[0].id}` : "upload.jpg");
+        setPic2(pics[1] ? `http://127.0.0.1:5000/weeklyImage/${pics[1].id}` : "upload.jpg");
+        setPic3(pics[2] ? `http://127.0.0.1:5000/weeklyImage/${pics[2].id}` : "upload.jpg");
+        setPic4(pics[3] ? `http://127.0.0.1:5000/weeklyImage/${pics[3].id}` : "upload.jpg");
+        setPic5(pics[4] ? `http://127.0.0.1:5000/weeklyImage/${pics[4].id}` : "upload.jpg");
+    })
+    .catch(err => console.error(err));
+}, []);
 
   async function imageChange(e:React.ChangeEvent<HTMLInputElement>, setPreview: (url: string) => void, picture: string, username: string, imageIndex: number){
     const file = e.target.files?.[0];

@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import random
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -467,6 +468,73 @@ def getTouches():
         return jsonify({"error": "User not found"}), 404
 
     return jsonify({"touches": user.get("touches", 0)}), 200
+
+@app.route("/getVotingPair/<int:image_index>", methods=["GET"])
+def getVotingPair(image_index):
+    print("image_index received:", image_index)
+    print("image_count:", image_count)
+    if image_index < 0 or image_index >= image_count:
+        return jsonify({"error": "Invalid image index"}), 400
+    
+    week_index = get_week_index()
+    print("Looking for week_index:", week_index)
+
+    all_docs = list(weekly_collection.find({"week_index": week_index}))
+
+    candidates = [
+        doc for doc in all_docs
+        if len(doc.get("images", [])) > image_index
+        and doc["images"][image_index] is not None
+    ]
+
+    print("candidates found:", len(candidates))
+
+    if len(candidates) < 2:
+        return jsonify({"error": "Not enough submissions to vote"}), 400    
+    
+    if len(candidates) < 2:
+        return jsonify({"error": "Not enough submissions to vote"}), 400
+    
+    pair = random.sample(candidates, 2)
+
+    return jsonify({
+        "image_index": image_index,
+        "candidate_a": weekly_doc_to_json(pair[0]),
+        "candidate_b": weekly_doc_to_json(pair[1])
+    }), 200
+
+@app.route("/submitVote/<int:image_index>", methods=["POST"])
+def submitVote(image_index):
+    if image_index < 0 or image_index >= image_count:
+        return jsonify({"error": "Invalid image index"}), 400
+
+    data = request.get_json(silent=True) or {}
+    winner_username = data.get("winner_username", "").strip()
+
+    if not winner_username:
+        return jsonify({"error": "winner_username is required"}), 400
+
+    week_index = get_week_index()
+
+    result = weekly_collection.update_one(
+        {
+            "username": winner_username,
+            "week_index": week_index,
+            f"images.{image_index}": {"$ne": None}
+        },
+        {
+            "$inc": {
+                f"image_touches.{image_index}": 1,
+                "touches_total": 1
+            }
+        }
+    )
+
+    if result.matched_count == 0:
+        return jsonify({"error": "Submission not found or image slot is empty"}), 404
+
+    return jsonify({"message": "Vote recorded"}), 200
+
 
 
 if __name__ == "__main__":

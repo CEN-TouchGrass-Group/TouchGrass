@@ -56,6 +56,12 @@ export default function Second() {
         >
           Log In
         </button>
+        <Link href = "../">
+        <button
+          
+          className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600"
+        >Return to Create Account</button>
+        </Link>
       </div>
     </div>
   );

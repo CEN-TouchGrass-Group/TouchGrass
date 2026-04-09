@@ -253,6 +253,8 @@ def createAccount():
         "touches": 0
     }
 
+    weekly_doc = get_or_create_weekly_document(newUsername)
+
     try:
         result = collection_name.insert_one(new_user)
     except DuplicateKeyError:

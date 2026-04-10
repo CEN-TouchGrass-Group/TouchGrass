@@ -56,9 +56,9 @@ export default function Home() {
 
             <h1 style ={{marginBottom:'20px',fontSize:'28px',color:'green',margin:'20px auto', padding:'25px'}}>Profile</h1>
 
-            <p style = {{marginBottom:'20px', paddingLeft:'25vw', fontSize:'25px'}}>Profile Username: {username}</p>
-            <p style = {{marginBottom:'60px', paddingLeft:'25vw', fontSize:'25px'}}>Total Profile Touches: {touches}</p>
-            <p style = {{marginBottom: '30px', paddingLeft:'25vw', fontSize: '25px'}}>Your Saved Profile Pictures(One save per category): </p>
+            <p style = {{marginBottom:'20px', color:'black', paddingLeft:'25vw', fontSize:'25px'}}>Profile Username: {username}</p>
+            <p style = {{marginBottom:'60px', color:'black', paddingLeft:'25vw', fontSize:'25px'}}>Total Profile Touches: {touches}</p>
+            <p style = {{marginBottom: '30px', color:'black', paddingLeft:'25vw', fontSize: '25px'}}>Your Saved Profile Pictures(One save per category): </p>
             <div style={{marginBottom:'60px', marginTop:'10px', display:'flex', flexDirection:'column', alignItems:'center', gap:'50px'}}>
                 {pictures .filter((pic) => pic !==null) .map((pic, index) => (
                     <div key={index} style={{textAlign:'center', display:'flex', flexDirection:'column', alignItems:'center'}}>

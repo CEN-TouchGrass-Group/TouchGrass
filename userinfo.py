@@ -559,7 +559,7 @@ def getPictures():
             image.append(None)
         else:
             image.append({
-                "file_id": str(img["file_id"]),"filename": img["filename"],"content_type": img["content_type"],
+                "file_id": str(img["file_id"]),"filename": img["filename"],"content_type": img["content_type"],"image_index": img["image_index"]
             })
     return jsonify({"pictures" : image})
 
@@ -601,6 +601,7 @@ def uploadImageUserInfo(username, image_index):
         "filename": clean_filename,
         "content_type": uploaded_file.content_type,
         "upload_date": datetime.utcnow(),
+        "image_index": image_index
     }
 
     old_image_value = user["images"][image_index]

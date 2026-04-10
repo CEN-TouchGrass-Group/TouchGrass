@@ -32,6 +32,8 @@ export default function Home() {
     });
   }, [index]);
 
+  //add code here to pull wiki links, just copy exact stuff above for new csv files*** (or ask Kieran)
+
   //display
 
   const [error, setError] = useState("");

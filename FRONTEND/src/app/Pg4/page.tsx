@@ -62,14 +62,14 @@ export default function Home() {
             <div style={{marginBottom:'60px', marginTop:'10px', display:'flex', flexDirection:'column', alignItems:'center', gap:'50px'}}>
                 {pictures .filter((pic) => pic !==null) .map((pic, index) => (
                     <div key={index} style={{textAlign:'center', display:'flex', flexDirection:'column', alignItems:'center'}}>
-                        <p style={{marginBottom:'10px'}}>{categories[index]}</p>
+                        <p style={{marginBottom:'10px'}}>{categories[pic.image_index]}</p>
                         <img key={index} src={`http://127.0.0.1:5000/getImages/${pic.file_id}`}
                         style={{width:'50%', height:'auto', border:'10px solid #18E745'}}/>
                     </div>
                 ))}
             </div>
 
-            <Link href = "/Login" style={{display:'flex',justifyContent:'center'}}>
+            <Link href = "/Login" style={{display:'flex',justifyContent:'center', marginBottom:'20px'}}>
 
                 <button className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600">
                     Log Out

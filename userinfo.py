@@ -563,5 +563,65 @@ def getPictures():
             })
     return jsonify({"pictures" : image})
 
+@app.route("/uploadImageUserInfo/<username>/<int:image_index>", methods=["POST"])
+def uploadImageUserInfo(username, image_index):
+    if image_index < 0 or image_index >= image_count:
+        return jsonify({"error": "Invalid image index"}), 400
+
+    user = collection_name.find_one({"username": username})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    if "image" not in request.files:
+        return jsonify({"error": "No image file provided"}), 400
+
+    uploaded_file = request.files["image"]
+    if uploaded_file.filename == "":
+        return jsonify({"error": "No image file selected"}), 400
+
+    if not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "File type not supported"}), 400
+
+    file_bytes = uploaded_file.read()
+    clean_filename = secure_filename(uploaded_file.filename)
+
+    image_id = fs.put(
+        file_bytes,
+        filename=clean_filename,
+        metadata={
+            "username": username,
+            "image_index": image_index,
+            "content_type": uploaded_file.content_type,
+            "upload_date": datetime.utcnow()
+        }
+    )
+
+    new_image_info = {
+        "file_id": image_id,
+        "filename": clean_filename,
+        "content_type": uploaded_file.content_type,
+        "upload_date": datetime.utcnow(),
+    }
+
+    old_image_value = user["images"][image_index]
+
+    collection_name.update_one(
+        {"_id": user["_id"]},
+        {"$set": {f"images.{image_index}": new_image_info}}
+    )
+
+    if old_image_value is not None and "file_id" in old_image_value:
+        try:
+            fs.delete(old_image_value["file_id"])
+        except Exception:
+            pass
+
+    updated_user = collection_name.find_one({"_id": user["_id"]})
+
+    return jsonify({
+        "message": f"Image stored successfully in slot {image_index}",
+        "user": JSONify_user(updated_user)
+    }), 200
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

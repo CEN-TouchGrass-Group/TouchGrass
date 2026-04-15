@@ -17,9 +17,11 @@ export default function Home() {
 
   //Using index to pull from csv, generate array of objectives
   const [objectives, setObjectives] = useState<string[]>([]);
+  const [wikiLinks, setWikiLinks] = useState<string[]>([]);
 
   useEffect(() => {
     const files = ["Animals", "Places", "Items", "Foods", "Miscellaneous"];
+    const wikiFiles = ["AnimalsWiki", "PlacesWiki", "ItemsWiki", "FoodsWiki", "MiscellaneousWiki"];
     
     Promise.all(
       files.map(f => fetch(`/${f}.csv`).then(res => res.text()))
@@ -29,7 +31,18 @@ export default function Home() {
         return rows[index];
       });
       setObjectives(picked);
+      
     });
+    Promise.all(
+      wikiFiles.map(f => fetch(`/${f}.csv`).then(res => res.text()))
+    ).then(results => {
+      const picked = results.map(text => {
+        const rows = text.split("\n").map(r => r.trim()).filter(r => r);
+        return rows[index];
+      });
+      setWikiLinks(picked);
+    });
+      
   }, [index]);
 
   //add code here to pull wiki links, just copy exact stuff above for new csv files*** (or ask Kieran)
@@ -125,6 +138,9 @@ export default function Home() {
 
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Animals</h2>
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: {objectives[0]}</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>
+        <a href={wikiLinks[0]} target="_blank" rel="noopener noreferrer" style={{color:'blue', textDecoration:'underline'}}>Learn more!</a>
+      </h2>
       <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
         <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 1</h2>
         <label className = "hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>
@@ -167,6 +183,9 @@ export default function Home() {
 
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Items</h2>
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: {objectives[2]}</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>
+        <a href={wikiLinks[2]} target="_blank" rel="noopener noreferrer" style={{color:'blue', textDecoration:'underline'}}>Learn more!</a>
+      </h2>
       <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
         <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 3</h2>
         <label className = "hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>
@@ -188,6 +207,9 @@ export default function Home() {
 
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center', marginTop:'50px'}}>Category: Foods</h2>
       <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>Objective: {objectives[3]}</h2>
+      <h2 style ={{marginBottom:'5px',fontSize:'28px',color:'black', textAlign:'center'}}>
+        <a href={wikiLinks[3]} target="_blank" rel="noopener noreferrer" style={{color:'blue', textDecoration:'underline'}}>Learn more!</a>
+      </h2>
       <div style = {{backgroundColor: '#95f195', border:'2px solid green', borderRadius:'12px',width:'60%',maxWidth:'600px',margin:'20px auto', padding:'25px'}}>
         <h2 style ={{marginBottom:'20px',fontSize:'28px',color:'green'}}>Upload Image 4</h2>
         <label className = "hover:bg-green-300" style = {{display:'block',backgroundColor:'white',color:'green',border:'2px solid green',borderRadius:'8px',padding:'12px 24px',fontSize:'18px',cursor:'pointer',transition:'0.2s'}}>

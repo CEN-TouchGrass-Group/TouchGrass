@@ -56,12 +56,14 @@ export default function Home() {
     fetch(`http://127.0.0.1:5000/getWeeklySubmission?username=${username}`)
       .then(res => res.json())
       .then(data => {
+        if (data.weekly_submission) {
         const pics = data.weekly_submission.images
         setPic1(pics[0] ? `http://127.0.0.1:5000/weeklyImage/${pics[0].id}` : "upload.jpg");
         setPic2(pics[1] ? `http://127.0.0.1:5000/weeklyImage/${pics[1].id}` : "upload.jpg");
         setPic3(pics[2] ? `http://127.0.0.1:5000/weeklyImage/${pics[2].id}` : "upload.jpg");
         setPic4(pics[3] ? `http://127.0.0.1:5000/weeklyImage/${pics[3].id}` : "upload.jpg");
         setPic5(pics[4] ? `http://127.0.0.1:5000/weeklyImage/${pics[4].id}` : "upload.jpg");
+        }
     })
     .catch(err => console.error(err));
 }, []);

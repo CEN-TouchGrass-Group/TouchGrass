@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
+from pydoc import doc
 import random
+from unittest import result
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -507,6 +509,8 @@ def getVotingPair(image_index):
 
 @app.route("/submitVote/<int:image_index>", methods=["POST"])
 def submitVote(image_index):
+    print("Collection name:", weekly_collection.name)
+    print("Doc count:", weekly_collection.count_documents({}))
     if image_index < 0 or image_index >= image_count:
         return jsonify({"error": "Invalid image index"}), 400
 
@@ -518,11 +522,15 @@ def submitVote(image_index):
 
     week_index = get_week_index()
 
+    doc = weekly_collection.find_one({
+    "username": winner_username,
+    "week_index": week_index,
+    })
+
     result = weekly_collection.update_one(
         {
             "username": winner_username,
-            "week_index": week_index,
-            f"images.{image_index}": {"$ne": None}
+            "week_index": week_index
         },
         {
             "$inc": {

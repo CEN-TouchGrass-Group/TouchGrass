@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 const CATEGORIES = ["Animals", "Places", "Items", "Foods", "Miscellaneous"];
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "http://127.0.0.1:5000";
 
 function VotingPair({ imageIndex, category }) {
     const [pair, setPair] = useState(null);
@@ -15,7 +15,7 @@ function VotingPair({ imageIndex, category }) {
 
     async function fetchPair() {
         try {
-            const response = await fetch(`${BASE_URL}/getVotingPair/${imageIndex}`);
+            const response = await fetch(`http://127.0.0.1:5000/getVotingPair/${imageIndex}`);
             const data = await response.json();
             if (response.ok) {
                 setPair(data);
@@ -28,7 +28,7 @@ function VotingPair({ imageIndex, category }) {
     }
 
     async function handleVote(winnerUsername) {
-        await fetch(`${BASE_URL}/submitVote/${imageIndex}`, {
+        await fetch(`http://127.0.0.1:5000/submitVote/${imageIndex}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ winner_username: winnerUsername })

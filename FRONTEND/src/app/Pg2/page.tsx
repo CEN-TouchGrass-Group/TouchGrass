@@ -33,6 +33,11 @@ function VotingPair({ imageIndex, category }) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ winner_username: winnerUsername })
         });
+        await fetch(`http://127.0.0.1:5000/submitVoteAllTime/${imageIndex}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ winner_username: winnerUsername })
+        });
         fetchPair();
     }
 

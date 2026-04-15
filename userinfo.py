@@ -509,8 +509,6 @@ def getVotingPair(image_index):
 
 @app.route("/submitVote/<int:image_index>", methods=["POST"])
 def submitVote(image_index):
-    print("Collection name:", weekly_collection.name)
-    print("Doc count:", weekly_collection.count_documents({}))
     if image_index < 0 or image_index >= image_count:
         return jsonify({"error": "Invalid image index"}), 400
 
@@ -536,6 +534,39 @@ def submitVote(image_index):
             "$inc": {
                 f"image_touches.{image_index}": 1,
                 "touches_total": 1
+            }
+        }
+    )
+
+    if result.matched_count == 0:
+        return jsonify({"error": "Submission not found or image slot is empty"}), 404
+
+    return jsonify({"message": "Vote recorded"}), 200
+
+
+@app.route("/submitVoteAllTime/<int:image_index>", methods=["POST"])
+def submitVoteAllTime(image_index):
+    if image_index < 0 or image_index >= image_count:
+        return jsonify({"error": "Invalid image index"}), 400
+
+    data = request.get_json(silent=True) or {}
+    winner_username = data.get("winner_username", "").strip()
+
+    if not winner_username:
+        return jsonify({"error": "winner_username is required"}), 400
+
+
+    doc = collection_name.find_one({
+    "username": winner_username,
+    })
+
+    result = collection_name.update_one(
+        {
+            "username": winner_username
+        },
+        {
+            "$inc": {
+                "touches": 1
             }
         }
     )

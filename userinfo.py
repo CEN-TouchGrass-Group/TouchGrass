@@ -446,22 +446,21 @@ def getProfileImage(file_id):
     return Response(stored_file.read(), mimetype=content_type)
 
 
-@app.route("/getWeeklyLeaderboard", methods=["GET"])
-def getWeeklyLeaderboard():
-    week_index = request.args.get("week_index", "").strip()
-
-    if week_index == "":
-        week_index = get_week_index()
-
-    leaderboard = weekly_collection.find({
-        "week_index": week_index
-    }).sort("touches_total", -1)
+@app.route("/getTopTen", methods=["GET"])
+def getTopTen():
+    leaderboard = weekly_collection.find().sort({"touches_total": -1}).limit(15);
 
     return jsonify({
-        "week_index": week_index,
         "leaderboard": [weekly_doc_to_json(doc) for doc in leaderboard]
     }), 200
 
+@app.route("/getLeaderPics", methods=["GET"])
+def getLeaderPics():
+    leaderboard = weekly_collection.find().sort({"touches_total": -1}).limit(3);
+
+    return jsonify({
+        "leaderboard": [weekly_doc_to_json(doc) for doc in leaderboard]
+    }), 200
 
 @app.route("/getTouches", methods=["GET"])
 def getTouches():

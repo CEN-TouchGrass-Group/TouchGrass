@@ -254,6 +254,8 @@ def createAccount():
         "created_at": datetime.utcnow(),
         "touches": 0
     }
+    
+    
 
     weekly_doc = get_or_create_weekly_document(newUsername)
 
@@ -454,12 +456,111 @@ def getTopTen():
         "leaderboard": [weekly_doc_to_json(doc) for doc in leaderboard]
     }), 200
 
-@app.route("/getLeaderPics", methods=["GET"])
-def getLeaderPics():
-    leaderboard = weekly_collection.find().sort({"touches_total": -1}).limit(3);
+    weekly_docs = list(weekly_collection.find({
+        "week_index": week_index
+    }))
+
+    leaderboard = []
+
+    for doc in weekly_docs:
+        doc = ensure_weekly_document_shape(doc)
+        weekly_total = sum(doc.get("image_touches", [0] * image_count))
+
+        if weekly_total != doc.get("touches_total", 0):
+            weekly_collection.update_one(
+                {"_id": doc["_id"]},
+                {"$set": {"touches_total": weekly_total}}
+            )
+            doc["touches_total"] = weekly_total
+
+        leaderboard.append({
+            "username": doc["username"],
+            "week_index": doc["week_index"],
+            "touches_total": doc["touches_total"],
+            "image_touches": doc["image_touches"],
+            "images": [weekly_image_to_json(image) for image in doc["images"]]
+        })
+
+    leaderboard.sort(key=lambda user: user["touches_total"], reverse=True)
 
     return jsonify({
-        "leaderboard": [weekly_doc_to_json(doc) for doc in leaderboard]
+        "week_index": week_index,
+        "leaderboard": leaderboard
+    }), 200
+    
+    
+@app.route("/getHistoricalLeaderboard", methods=["GET"])
+def getHistoricalLeaderboard():
+    users = list(collection_name.find({}))
+
+    leaderboard = []
+
+    for user in users:
+        leaderboard.append({
+            "username": user["username"],
+            "touches": user.get("touches", 0),
+            "images": [JSONify_image(image) for image in user.get("images", [None] * image_count)]
+        })
+
+    leaderboard.sort(key=lambda user: user["touches"], reverse=True)
+
+    return jsonify({
+        "leaderboard": leaderboard
+    }), 200
+    
+
+@app.route("/castVote", methods=["POST"])
+def castVote():
+    data = request.get_json(silent=True) or {}
+
+    username = data.get("username", "").strip()
+    image_index = data.get("image_index")
+    week_index = data.get("week_index", "").strip()
+
+    if not username:
+        return jsonify({"error": "Username is required"}), 400
+
+    if image_index is None or image_index < 0 or image_index >= image_count:
+        return jsonify({"error": "Invalid image index"}), 400
+
+    if week_index == "":
+        week_index = get_week_index()
+
+    weekly_doc = weekly_collection.find_one({
+        "username": username,
+        "week_index": week_index
+    })
+
+    if not weekly_doc:
+        return jsonify({"error": "Weekly submission not found"}), 404
+
+    weekly_doc = ensure_weekly_document_shape(weekly_doc)
+
+    if weekly_doc["images"][image_index] is None:
+        return jsonify({"error": "No image found in that slot"}), 404
+
+    weekly_collection.update_one(
+        {"_id": weekly_doc["_id"]},
+        {
+            "$inc": {
+                f"image_touches.{image_index}": 1,
+                "touches_total": 1
+            }
+        }
+    )
+
+    collection_name.update_one(
+        {"username": username},
+        {"$inc": {"touches": 1}}
+    )
+
+    updated_weekly_doc = weekly_collection.find_one({"_id": weekly_doc["_id"]})
+    updated_user = collection_name.find_one({"username": username})
+
+    return jsonify({
+        "message": "Vote recorded successfully",
+        "weekly_submission": weekly_doc_to_json(updated_weekly_doc),
+        "historical_touches": updated_user.get("touches", 0)
     }), 200
 
 @app.route("/getTouches", methods=["GET"])

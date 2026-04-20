@@ -5,17 +5,17 @@ import Link from "next/link";
 const CATEGORIES = ["Animals", "Places", "Items", "Foods", "Miscellaneous"];
 const BASE_URL = "http://127.0.0.1:5000";
 
-function VotingPair({ imageIndex, category }) {
+function VotingPair({ imageIndex, category, username }) {
     const [pair, setPair] = useState(null);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetchPair();
-    }, []);
+        if (username) fetchPair();
+    }, [username]);
 
     async function fetchPair() {
         try {
-            const response = await fetch(`http://127.0.0.1:5000/getVotingPair/${imageIndex}`);
+            const response = await fetch(`http://127.0.0.1:5000/getVotingPair/${imageIndex}/${username}`);
             const data = await response.json();
             if (response.ok) {
                 setPair(data);
@@ -81,6 +81,11 @@ function VotingPair({ imageIndex, category }) {
 }
 
 export default function Home() {
+    const [username, Name] = useState("");
+
+    useEffect(() => {
+      Name(localStorage.getItem("username") || "");
+    }, []);
     return (
         <div className="min-h-screen bg-white flex flex-col">
             <nav className="text-white">
@@ -103,7 +108,7 @@ export default function Home() {
 
             {CATEGORIES.map((category, index) => (
                 <div key={index}>
-                    <VotingPair imageIndex={index} category={category} />
+                    <VotingPair imageIndex={index} category={category} username={username} />
                     {index < CATEGORIES.length - 1 && (
                         <div className="h-[3px] bg-green-400 mx-[15%]"></div>
                     )}

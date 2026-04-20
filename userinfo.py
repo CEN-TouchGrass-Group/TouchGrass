@@ -472,8 +472,8 @@ def getTouches():
 
     return jsonify({"touches": user.get("touches", 0)}), 200
 
-@app.route("/getVotingPair/<int:image_index>", methods=["GET"])
-def getVotingPair(image_index):
+@app.route("/getVotingPair/<int:image_index>/<string:username>", methods=["GET"])
+def getVotingPair(image_index, username):
     print("image_index received:", image_index)
     print("image_count:", image_count)
     if image_index < 0 or image_index >= image_count:
@@ -487,7 +487,7 @@ def getVotingPair(image_index):
     candidates = [
         doc for doc in all_docs
         if len(doc.get("images", [])) > image_index
-        and doc["images"][image_index] is not None
+        and doc["images"][image_index] is not None and doc["username"] != username
     ]
 
     print("candidates found:", len(candidates))

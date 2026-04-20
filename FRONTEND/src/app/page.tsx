@@ -53,15 +53,17 @@ export default function Home() {
         {error && <p className="text-red-500 text-sm">{error}</p>}
           <button
             onClick={handlecreateAccount}
-            className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600"
+            className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold"
           >
             Create Account
           </button>
-        <Link href = "/Login">
-          <button className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600">
+
+          <Link
+            href="/Login"
+            className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold text-center"
+          >
             Log In
-          </button>
-        </Link>
+          </Link>
       </div>
     </div>
   );

@@ -52,15 +52,15 @@ export default function Second() {
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <button
           onClick={handleLogin}
-          className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600"
+          className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold"
         >
           Log In
         </button>
-        <Link href = "../">
-        <button
-          
-          className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold hover:bg-green-600"
-        >Return to Create Account</button>
+        <Link
+          href="../"
+          className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 font-semibold text-center"
+        >
+          Return to Create Account
         </Link>
       </div>
     </div>

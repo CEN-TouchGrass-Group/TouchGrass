@@ -1,4 +1,7 @@
 from datetime import datetime, timedelta
+from pydoc import doc
+import random
+from unittest import result
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -254,6 +257,8 @@ def createAccount():
     
     
 
+    weekly_doc = get_or_create_weekly_document(newUsername)
+
     try:
         result = collection_name.insert_one(new_user)
     except DuplicateKeyError:
@@ -443,12 +448,13 @@ def getProfileImage(file_id):
     return Response(stored_file.read(), mimetype=content_type)
 
 
-@app.route("/getWeeklyLeaderboard", methods=["GET"])
-def getWeeklyLeaderboard():
-    week_index = request.args.get("week_index", "").strip()
+@app.route("/getTopTen", methods=["GET"])
+def getTopTen():
+    leaderboard = weekly_collection.find().sort({"touches_total": -1}).limit(15);
 
-    if week_index == "":
-        week_index = get_week_index()
+    return jsonify({
+        "leaderboard": [weekly_doc_to_json(doc) for doc in leaderboard]
+    }), 200
 
     weekly_docs = list(weekly_collection.find({
         "week_index": week_index
@@ -557,7 +563,6 @@ def castVote():
         "historical_touches": updated_user.get("touches", 0)
     }), 200
 
-
 @app.route("/getTouches", methods=["GET"])
 def getTouches():
     username = request.args.get("username")
@@ -568,6 +573,195 @@ def getTouches():
 
     return jsonify({"touches": user.get("touches", 0)}), 200
 
+@app.route("/getVotingPair/<int:image_index>/<string:username>", methods=["GET"])
+def getVotingPair(image_index, username):
+    print("image_index received:", image_index)
+    print("image_count:", image_count)
+    if image_index < 0 or image_index >= image_count:
+        return jsonify({"error": "Invalid image index"}), 400
+    
+    week_index = get_week_index()
+    print("Looking for week_index:", week_index)
+
+    all_docs = list(weekly_collection.find({"week_index": week_index}))
+
+    candidates = [
+        doc for doc in all_docs
+        if len(doc.get("images", [])) > image_index
+        and doc["images"][image_index] is not None and doc["username"] != username
+    ]
+
+    print("candidates found:", len(candidates))
+
+    if len(candidates) < 2:
+        return jsonify({"error": "Not enough submissions to vote"}), 400    
+    
+    if len(candidates) < 2:
+        return jsonify({"error": "Not enough submissions to vote"}), 400
+    
+    pair = random.sample(candidates, 2)
+
+    return jsonify({
+        "image_index": image_index,
+        "candidate_a": weekly_doc_to_json(pair[0]),
+        "candidate_b": weekly_doc_to_json(pair[1])
+    }), 200
+
+@app.route("/submitVote/<int:image_index>", methods=["POST"])
+def submitVote(image_index):
+    if image_index < 0 or image_index >= image_count:
+        return jsonify({"error": "Invalid image index"}), 400
+
+    data = request.get_json(silent=True) or {}
+    winner_username = data.get("winner_username", "").strip()
+
+    if not winner_username:
+        return jsonify({"error": "winner_username is required"}), 400
+
+    week_index = get_week_index()
+
+    doc = weekly_collection.find_one({
+    "username": winner_username,
+    "week_index": week_index,
+    })
+
+    result = weekly_collection.update_one(
+        {
+            "username": winner_username,
+            "week_index": week_index
+        },
+        {
+            "$inc": {
+                f"image_touches.{image_index}": 1,
+                "touches_total": 1
+            }
+        }
+    )
+
+    if result.matched_count == 0:
+        return jsonify({"error": "Submission not found or image slot is empty"}), 404
+
+    return jsonify({"message": "Vote recorded"}), 200
+
+
+@app.route("/submitVoteAllTime/<int:image_index>", methods=["POST"])
+def submitVoteAllTime(image_index):
+    if image_index < 0 or image_index >= image_count:
+        return jsonify({"error": "Invalid image index"}), 400
+
+    data = request.get_json(silent=True) or {}
+    winner_username = data.get("winner_username", "").strip()
+
+    if not winner_username:
+        return jsonify({"error": "winner_username is required"}), 400
+
+
+    doc = collection_name.find_one({
+    "username": winner_username,
+    })
+
+    result = collection_name.update_one(
+        {
+            "username": winner_username
+        },
+        {
+            "$inc": {
+                "touches": 1
+            }
+        }
+    )
+
+    if result.matched_count == 0:
+        return jsonify({"error": "Submission not found or image slot is empty"}), 404
+
+    return jsonify({"message": "Vote recorded"}), 200
+
+
+
+@app.route("/getImages/<file_id>", methods=["GET"])
+def getImages(file_id):
+    try:
+        file = fs.get(ObjectId(file_id))
+        return Response(file.read(), mimetype=file.content_type)
+    except:
+        return jsonify({"error": "Images not found"}), 404
+    
+@app.route("/getPictures", methods=["GET"])
+def getPictures():
+    username = request.args.get("username")
+    user = collection_name.find_one({"username" : username})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    image = []
+    for img in user["images"]:
+        if img is None:
+            image.append(None)
+        else:
+            image.append({
+                "file_id": str(img["file_id"]),"filename": img["filename"],"content_type": img["content_type"],"image_index": img["image_index"]
+            })
+    return jsonify({"pictures" : image})
+
+@app.route("/uploadImageUserInfo/<username>/<int:image_index>", methods=["POST"])
+def uploadImageUserInfo(username, image_index):
+    if image_index < 0 or image_index >= image_count:
+        return jsonify({"error": "Invalid image index"}), 400
+
+    user = collection_name.find_one({"username": username})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    if "image" not in request.files:
+        return jsonify({"error": "No image file provided"}), 400
+
+    uploaded_file = request.files["image"]
+    if uploaded_file.filename == "":
+        return jsonify({"error": "No image file selected"}), 400
+
+    if not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "File type not supported"}), 400
+
+    file_bytes = uploaded_file.read()
+    clean_filename = secure_filename(uploaded_file.filename)
+
+    image_id = fs.put(
+        file_bytes,
+        filename=clean_filename,
+        metadata={
+            "username": username,
+            "image_index": image_index,
+            "content_type": uploaded_file.content_type,
+            "upload_date": datetime.utcnow()
+        }
+    )
+
+    new_image_info = {
+        "file_id": image_id,
+        "filename": clean_filename,
+        "content_type": uploaded_file.content_type,
+        "upload_date": datetime.utcnow(),
+        "image_index": image_index
+    }
+
+    old_image_value = user["images"][image_index]
+
+    collection_name.update_one(
+        {"_id": user["_id"]},
+        {"$set": {f"images.{image_index}": new_image_info}}
+    )
+
+    if old_image_value is not None and "file_id" in old_image_value:
+        try:
+            fs.delete(old_image_value["file_id"])
+        except Exception:
+            pass
+
+    updated_user = collection_name.find_one({"_id": user["_id"]})
+
+    return jsonify({
+        "message": f"Image stored successfully in slot {image_index}",
+        "user": JSONify_user(updated_user)
+    }), 200
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

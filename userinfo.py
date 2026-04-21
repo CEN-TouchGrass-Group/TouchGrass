@@ -73,7 +73,8 @@ def JSONify_user(user):
         "username": user["username"],
         "images": [JSONify_image(image) for image in images],
         "created_at": created_at.isoformat(),
-        "touches": user.get("touches", 0)
+        "touches": user.get("touches", 0),
+        "is_admin": user.get("is_admin", False)
     }
 
 
@@ -174,6 +175,11 @@ def weekly_doc_to_json(weekly_doc):
         "images": [weekly_image_to_json(image) for image in weekly_doc["images"]]
     }
 
+def is_admin(username):
+    user = collection_name.find_one({"username": username})
+    if not user:
+        return False
+    return user.get("is_admin", False)
 
 def save_profile_image_from_weekly(user, profile_index, weekly_image_info):
     user = ensure_user_image_array(user)
@@ -252,7 +258,8 @@ def createAccount():
         "password_hash": password_hash,
         "images": [None] * image_count,
         "created_at": datetime.utcnow(),
-        "touches": 0
+        "touches": 0,
+        "is_admin": False
     }
 
     weekly_doc = get_or_create_weekly_document(newUsername)
@@ -661,6 +668,98 @@ def uploadImageUserInfo(username, image_index):
         "message": f"Image stored successfully in slot {image_index}",
         "user": JSONify_user(updated_user)
     }), 200
+
+
+@app.route("/admin/setAdmin", methods=["POST"])
+def setAdmin():
+    """Set or revoke admin privileges for a user (admin-only)"""
+    data = request.get_json(silent=True) or {}
+    admin_username = data.get("admin_username", "").strip()
+    target_username = data.get("target_username", "").strip()
+    make_admin = data.get("make_admin", False)
+
+    if not admin_username or not target_username:
+        return jsonify({"error": "Both admin_username and target_username are required"}), 400
+
+    # Check if requesting user is admin
+    if not is_admin(admin_username):
+        return jsonify({"error": "Unauthorized: Admin privileges required"}), 403
+
+    # Find target user
+    target_user = collection_name.find_one({"username": target_username})
+    if not target_user:
+        return jsonify({"error": "Target user not found"}), 404
+
+    # Update admin status
+    collection_name.update_one(
+        {"username": target_username},
+        {"$set": {"is_admin": make_admin}}
+    )
+
+    action = "granted" if make_admin else "revoked"
+    return jsonify({
+        "message": f"Admin privileges {action} for user {target_username}",
+        "user": JSONify_user(collection_name.find_one({"username": target_username}))
+    }), 200
+
+
+@app.route("/admin/deleteUser", methods=["DELETE"])
+def deleteUser():
+    """Delete a user account and all associated data (admin-only)"""
+    data = request.get_json(silent=True) or {}
+    admin_username = data.get("admin_username", "").strip()
+    target_username = data.get("target_username", "").strip()
+
+    if not admin_username or not target_username:
+        return jsonify({"error": "Both admin_username and target_username are required"}), 400
+
+    # Check if requesting user is admin
+    if not is_admin(admin_username):
+        return jsonify({"error": "Unauthorized: Admin privileges required"}), 403
+
+    # Prevent admins from deleting themselves
+    if admin_username == target_username:
+        return jsonify({"error": "Cannot delete your own admin account"}), 400
+
+    # Find target user
+    target_user = collection_name.find_one({"username": target_username})
+    if not target_user:
+        return jsonify({"error": "Target user not found"}), 404
+
+    try:
+        # Delete all profile images from GridFS
+        for image in target_user.get("images", []):
+            if image is not None and "file_id" in image:
+                try:
+                    fs.delete(image["file_id"])
+                except Exception:
+                    pass
+
+        # Delete all weekly submission images from GridFS
+        weekly_docs = weekly_collection.find({"username": target_username})
+        for weekly_doc in weekly_docs:
+            for image in weekly_doc.get("images", []):
+                if image is not None and "file_id" in image:
+                    try:
+                        weekly_fs.delete(image["file_id"])
+                    except Exception:
+                        pass
+
+        # Delete all weekly submission documents
+        weekly_collection.delete_many({"username": target_username})
+
+        # Delete the user account
+        result = collection_name.delete_one({"username": target_username})
+
+        if result.deleted_count == 0:
+            return jsonify({"error": "Failed to delete user"}), 500
+
+        return jsonify({
+            "message": f"User {target_username} and all associated data deleted successfully"
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Error deleting user: {str(e)}"}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

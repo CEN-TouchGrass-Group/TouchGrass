@@ -456,38 +456,13 @@ def getTopTen():
         "leaderboard": [weekly_doc_to_json(doc) for doc in leaderboard]
     }), 200
 
-    weekly_docs = list(weekly_collection.find({
-        "week_index": week_index
-    }))
-
-    leaderboard = []
-
-    for doc in weekly_docs:
-        doc = ensure_weekly_document_shape(doc)
-        weekly_total = sum(doc.get("image_touches", [0] * image_count))
-
-        if weekly_total != doc.get("touches_total", 0):
-            weekly_collection.update_one(
-                {"_id": doc["_id"]},
-                {"$set": {"touches_total": weekly_total}}
-            )
-            doc["touches_total"] = weekly_total
-
-        leaderboard.append({
-            "username": doc["username"],
-            "week_index": doc["week_index"],
-            "touches_total": doc["touches_total"],
-            "image_touches": doc["image_touches"],
-            "images": [weekly_image_to_json(image) for image in doc["images"]]
-        })
-
-    leaderboard.sort(key=lambda user: user["touches_total"], reverse=True)
+@app.route("/getLeaderPics", methods=["GET"])
+def getLeaderPics():
+    leaderboard = weekly_collection.find().sort({"touches_total": -1}).limit(3);
 
     return jsonify({
-        "week_index": week_index,
-        "leaderboard": leaderboard
-    }), 200
-    
+        "leaderboard": [weekly_doc_to_json(doc) for doc in leaderboard]
+    }), 200    
     
 @app.route("/getHistoricalLeaderboard", methods=["GET"])
 def getHistoricalLeaderboard():

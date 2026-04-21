@@ -1,24 +1,76 @@
 # TouchGrass
-Repository for CEN TouchGrass group project
 
-Website or App TBD
-Login (username & password) [Python Django or JavaScript)
-    4 Tabs
-      Challenge for week [Text display][Backend algorithm to pull item][Display top voted items for each tag]
-        500 items (Can generate)
-        Randomly 5 items each day
-        Items mutually exclusive and no day repeats
-      Photo Upload
-        GUI to upload photos
-        Database to store user uploads
-        Display your uploads
-      Leaderboard
-        Database of all photos uploaded
-        Voting mechanism and ranked display
-        Tag sorting
-        Karma board
-      History and profile
-        User info
-        Profile photo
-        Karma count
+Touch Grass is a gamified outdoor scavenger hunt platform. Users receive a "challenge" for the week with 5 categories and objectives that are updated daily. Users are expected to go take pictures of these items in real life and submit them to the platform. Each user can vote on other users' images in a "Hot or Not" system. The top 15 users get displayed in a leaderboard according to their number of "touches." Users can also save their favorite personal images to their profile.
 
+## Installation Instructions
+
+### Prerequisites
+- Node.js and npm installed
+- Python 3.x installed
+- Git installed
+
+### Setup Steps
+
+1. **Clone the repository from GitHub:**
+   ```bash
+   git clone https://github.com/CEN-TouchGrass-Group/TouchGrass.git
+   ```
+
+2. **Navigate to the project directory:**
+   ```bash
+   cd TouchGrass
+   ```
+
+3. **Navigate to the FRONTEND directory:**
+   ```bash
+   cd FRONTEND
+   ```
+
+4. **Install frontend dependencies:**
+   ```bash
+   npm install
+   ```
+
+5. **Install Material UI dependencies:**
+   ```bash
+   npm install @mui/material @emotion/react @emotion/styled
+   ```
+
+6. **Start the frontend server:**
+   ```bash
+   npm run dev
+   ```
+
+7. **In a separate terminal, navigate to the root directory of the project:**
+   ```bash
+   cd TouchGrass
+   ```
+
+8. **Run the backend server:**
+   ```bash
+   python userinfo.py
+   ```
+
+9. **Open your browser and go to:**
+   ```
+   http://localhost:3000/
+   ```
+
+10. **You can now create an account and start using TouchGrass!**
+
+## Features
+
+- Weekly photo challenges with 5 categories
+- Daily objective updates
+- Image submission and voting system
+- "Hot or Not" style voting on user submissions
+- Leaderboard displaying top 15 users by "touches"
+- Personal profile with saved favorite images
+- Admin system for user management
+
+## Tech Stack
+
+- **Frontend:** React, Next.js, Material UI
+- **Backend:** Python, Flask
+- **Database:** MongoDB Atlas
+- **Image Storage:** GridFS

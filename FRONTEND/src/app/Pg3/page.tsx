@@ -33,9 +33,11 @@ export default function Home() {
         image_index: number;
     }[] | null[];
   }
+    const [thisUser, setthisUser] = useState("");
     const [leaderboard, Leaderboard] = useState<leaderboardData[]>([]);
     const [leaderPics, setLeaderPics] = useState<imageData[]>([]);
     useEffect(() => {
+          setthisUser(localStorage.getItem("username") || "");
           async function getTopTen() {
           const res = await fetch(`http://127.0.0.1:5000/getTopTen`, {
           method: "GET",
@@ -54,6 +56,14 @@ export default function Home() {
             }
             getLeaderPics();
         }, []);
+
+    const deleteUser = async (username: string) => {
+      const res = await fetch(`http://127.0.0.1:5000/deleteUser`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({username}),
+      });
+    };
 
     return (
         <div className="min-h-screen bg-red-100 flex flex-col">
@@ -91,7 +101,7 @@ export default function Home() {
           </TableHead>
           <TableBody>
             {leaderboard.map((entry, index) => (
-              <TableRow key={entry.username}>
+              <TableRow key={entry.username} onClick={thisUser === "Admin" ? ()=> deleteUser(entry.username) : undefined}>
                 <TableCell align="center">{index + 1}</TableCell>
                 <TableCell align="center">{entry.touches_total}</TableCell>
                 <TableCell align="center">{entry.username}</TableCell>

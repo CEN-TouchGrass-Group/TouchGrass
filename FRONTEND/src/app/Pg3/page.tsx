@@ -36,6 +36,7 @@ export default function Home() {
     const [thisUser, setthisUser] = useState("");
     const [leaderboard, Leaderboard] = useState<leaderboardData[]>([]);
     const [leaderPics, setLeaderPics] = useState<imageData[]>([]);
+    const [admin, setAdmin] = useState(false);
     useEffect(() => {
           setthisUser(localStorage.getItem("username") || "");
           async function getTopTen() {
@@ -55,14 +56,35 @@ export default function Home() {
             setLeaderPics(data.leaderboard);
             }
             getLeaderPics();
+
+            async function checkAdmin() {
+              const username = localStorage.getItem("username") || "";
+              const res = await fetch(`http://127.0.0.1:5000/admin/check_is_admin/${username}`, {
+              method: "GET",
+              headers: {"Content-Type": "application/json"},
+              });
+              const data = await res.json();
+              setAdmin(data.is_admin);
+              }
+              checkAdmin();
         }, []);
 
-    const deleteUser = async (username: string) => {
-      const res = await fetch(`http://127.0.0.1:5000/deleteUser`, {
-      method: "POST",
+    const deleteUser = async (Username: string) => {
+      const res = await fetch(`http://127.0.0.1:5000/admin/deleteUser`, {
+      method: "DELETE",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({username}),
+      body: JSON.stringify({admin_username: thisUser, target_username: Username}),
       });
+      const re = await fetch(`http://127.0.0.1:5000/getTopTen`, {
+          method: "GET",
+          });
+      const dat = await re.json();
+      Leaderboard(dat.leaderboard);
+      const r = await fetch(`http://127.0.0.1:5000/getLeaderPics`, {
+            method: "GET",
+            });
+      const da = await r.json();
+      setLeaderPics(da.leaderboard);
     };
 
     return (
@@ -101,7 +123,7 @@ export default function Home() {
           </TableHead>
           <TableBody>
             {leaderboard.map((entry, index) => (
-              <TableRow key={entry.username} onClick={thisUser === "Admin" ? ()=> deleteUser(entry.username) : undefined}>
+              <TableRow key={entry.username} onClick={admin ? ()=> deleteUser(entry.username) : undefined}>
                 <TableCell align="center">{index + 1}</TableCell>
                 <TableCell align="center">{entry.touches_total}</TableCell>
                 <TableCell align="center">{entry.username}</TableCell>

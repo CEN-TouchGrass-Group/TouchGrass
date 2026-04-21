@@ -175,11 +175,17 @@ def weekly_doc_to_json(weekly_doc):
         "images": [weekly_image_to_json(image) for image in weekly_doc["images"]]
     }
 
+
 def is_admin(username):
     user = collection_name.find_one({"username": username})
     if not user:
         return False
     return user.get("is_admin", False)
+
+@app.route("/admin/check_is_admin/<username>", methods=["GET"])
+def check_is_admin(username):
+    answer = is_admin(username)
+    return jsonify({"is_admin": answer}), 200
 
 def save_profile_image_from_weekly(user, profile_index, weekly_image_info):
     user = ensure_user_image_array(user)
